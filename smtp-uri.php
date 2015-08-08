@@ -1,15 +1,14 @@
 <?php
 /*
 Plugin Name: SMTP URI
-Plugin URI: https://github.com/szepeviktor/wordpress-plugin-construction
+Plugin URI: https://github.com/szepeviktor
 Description: Set SMTP options from the SMTP_URI named constant.
 Version: 0.4.2
 License: The MIT License (MIT)
 Author: Viktor Szépe
 Author URI: http://www.online1.hu/webdesign/
-GitHub Plugin URI: https://github.com/szepeviktor/wordpress-plugin-construction/tree/master/mu-smtp-uri
+GitHub Plugin URI: https://github.com/szepeviktor/smtp-uri
 */
-
 
 /*
 @TODO Add DKIM header
