@@ -1,8 +1,8 @@
 <?php
 /*
-Plugin Name: SMTP URI
+Plugin Name: SMTP URI and logging
 Plugin URI: https://github.com/szepeviktor
-Description: Set SMTP options from the SMTP_URI named constant.
+Description: SMTP settings for WordPress and error logging.
 Version: 0.4.2
 License: The MIT License (MIT)
 Author: Viktor Szépe

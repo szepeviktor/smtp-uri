@@ -1,35 +1,39 @@
-=== SMTP URI ===
+=== SMTP URI and logging ===
 Contributors: szepe.viktor
 Donate link: https://szepe.net/wp-donate/
-Tags: email, mail, send, smtp, tls, gmail, mandrill, hotmail, outlook
+Tags: email, mail, send, smtp, starttls, tls, gmail, mandrill, hotmail, outlook
 Requires at least: 4.0
 Tested up to: 4.3
 Stable tag: 0.4.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Set SMTP options and log sending errors.
+SMTP settings for WordPress and error logging.
 
 == Description ==
 
 Using SMTP protocol to transfer emails ensures solid operations.
-It is very easy to set up SMTP. You can find the settings for this plugin at the bottom of Options / General.
+It is very easy to set up SMTP. You can find the settings for this plugin at the bottom of WordPress admin menu Options / General.
 
-You should get these parameters from your ISP, hosting provider, webmaster, email provider etc.
+You should get your SMTP settings from your ISP, hosting provider, webmaster, email provider etc.
 
 Encryption types (protocols) are as follows:
 
-* For encrypted connection (STARTTLS on submission port) start your SMTP URI with `smtpTLS://`, the default port is 587.
-* For fully SSL encrypted connection (SMTPS) start it with `smtps://`, the default port is 465.
-* For unencrypted connection (plain SMTP) start it with `smtp://`, the default port is 25. This is **not recommended** for non-local servers.
+* For encrypted connection (STARTTLS on submission port) start your SMTP URI with `smtpTLS://` - the default port is 587.
+* For fully SSL encrypted connection (SMTPS) start it with `smtps://` - the default port is 465.
+* For unencrypted connection (plain SMTP) start it with `smtp://` - the default port is 25. This is **not recommended** for non-local servers.
 
-Using every option SMTP URI formally looks like: `smtpTLS://USERNAME:PASSWORD@HOST:PORT`.
+Using every option SMTP URI formally looks like:
+
+`
+smtpTLS://USERNAME:PASSWORD@HOST:PORT
+`
 
 Thus encryption type and `://` and user name and `:` and password and `@` and mail server name and `:` and port number.
 
 **WARNING!** Use [URL-encoded](http://meyerweb.com/eric/tools/dencoder/) strings.
 
-You can find the settings for this plugin at the bottom of Options / General.
+You can find the settings for this plugin at the bottom of WordPress admin Options / General.
 
 You may define your SMTP URI in `wp-config.php`:
 
@@ -37,13 +41,14 @@ You may define your SMTP URI in `wp-config.php`:
 define( 'SMTP_URI', 'smtpTLS://USERNAME:PASSWORD@HOST:PORT' );
 `
 
-To set `From:` name and `From:` address in the email use
+To set `From:` name and `From:` address use
 [WP Mail From II plugin](https://wordpress.org/plugins/wp-mailfrom-ii/).
 
 = SMTP error logging =
 
-SMTP communication errors are logged in PHP error.log and - if Sucuri Scanner plugin is available -
-are sent to Sucuri and can be viewed in the Alert Logs panel.
+SMTP communication errors are logged in PHP error.log and - if
+[Sucuri Scanner](https://wordpress.org/plugins/sucuri-scanner/)
+plugin is available - are sent to Sucuri and can be viewed in its Alert Logs panel.
 
 = TODO =
 
@@ -53,19 +58,49 @@ are sent to Sucuri and can be viewed in the Alert Logs panel.
 
 = Usage examples =
 
-Unauthenticated local SMTP server on port 25: `smtp://localhost`
+Unauthenticated local SMTP server on port 25
 
-Unauthenticated local SMTP server on submission port `smtpTLS://localhost`
+`
+smtp://localhost
+`
 
-Authenticated connection to localhost on port 25: `smtp://john.doe:Secretpwd1@localhost`
+Unauthenticated local SMTP server on submission port
 
-"@" sign in the username: `smtps://john.doe%40@gmail.com:Secretpwd1@smtp.gmail.com`
+`
+smtpTLS://localhost
+`
 
-Gmail example: `smtps://your.address%40gmail.com:Gmail_password@smtp.gmail.com`
+Authenticated connection to localhost on port 25
 
-Unauthenticated SMTP server on a custom port `smtpTLS://mail.server.net:2525
+`
+smtp://john.doe:Secretpwd1@localhost
+`
 
-Mandrill example: `smtpTLS://REGISTERED%40EMAIL:API-KEY@smtp.mandrillapp.com`
+"@" sign in the username
+
+`
+smtps://john.doe%40@gmail.com:Secretpwd1@smtp.gmail.com
+`
+
+Gmail example
+
+`
+smtps://your.address%40gmail.com:Gmail_password@smtp.gmail.com
+`
+
+Unauthenticated SMTP server on a custom port
+
+`
+smtpTLS://mail.server.net:2525
+`
+
+Mandrill example
+
+`
+smtpTLS://REGISTERED%40EMAIL:API-KEY@smtp.mandrillapp.com
+`
+
+Development goes on on [GitHub](https://github.com/szepeviktor/smtp-uri).
 
 == Installation ==
 
