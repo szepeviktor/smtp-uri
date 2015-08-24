@@ -3,7 +3,7 @@
 Plugin Name: SMTP URI and logging
 Plugin URI: https://github.com/szepeviktor
 Description: SMTP settings for WordPress and error logging.
-Version: 0.4.2
+Version: 0.4.4
 License: The MIT License (MIT)
 Author: Viktor Szépe
 Author URI: http://www.online1.hu/webdesign/
@@ -70,6 +70,8 @@ class O1_Smtp_Uri {
             case 'smtp':
                 $mail->SMTPSecure = '';
                 $mail->Port = 25;
+                // Only explicit encryption
+                $mail->SMTPAutoTLS = false;
                 break;
             case 'smtps':
                 $mail->SMTPSecure = 'ssl';
@@ -176,7 +178,7 @@ class O1_Smtp_Uri {
         );
         add_settings_field(
             'smtp_uri',
-            'SMTP URI',
+            '<label for="smtp_uri">SMTP URI</label>',
             array( $this, 'admin_field' ),
             'general',
             'smtp_uri_section'
