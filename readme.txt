@@ -4,7 +4,7 @@ Donate link: https://szepe.net/wp-donate/
 Tags: email, mail, send, smtp, starttls, tls, gmail, mandrill, hotmail, outlook
 Requires at least: 4.0
 Tested up to: 4.3
-Stable tag: 0.4.4
+Stable tag: 0.4.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,6 +50,16 @@ To set `From:` name and `From:` address use
 SMTP communication errors are logged in PHP error.log and - if
 [Sucuri Scanner](https://wordpress.org/plugins/sucuri-scanner/)
 plugin is available - are sent to Sucuri and can be viewed in its Alert Logs panel.
+
+= Adding automatic Bcc: address =
+
+An automatic Bcc: address can be set by adding path to SMTP URI: `/admin_email`.
+
+= SMTP debugging =
+
+Add query string to SMTP URI: `?debug`.
+
+Debug level can be set by adding a value: `?debug=4`, possible values: 0,1,2,4
 
 = TODO =
 
@@ -127,6 +137,14 @@ $mail->addBCC( get_bloginfo( 'admin_email' ) );
 `
 
 == Changelog ==
+
+= 0.4.5 =
+* Added plugin link
+* Added invalid From: address detection , correction is to set `admin_email`
+* An automatic Bcc: address can be set by adding path to SMTP URI: `/admin_email`
+* Adding any other path sets automatic Bcc: address, remember to use URL encoding, %40 for `@`
+* SMTP debug to PHP error.log can be turned on by adding query string to SMTP URI: `?debug`
+* Debug level can be set by adding a value: `?debug=4`, possible values: 0,1,2,4
 
 = 0.4.4 =
 * Encryption is explicitly disabled when using `smtp://` (PHP 5.6 requires valid certificate)

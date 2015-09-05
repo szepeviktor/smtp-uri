@@ -3,19 +3,19 @@
 Plugin Name: SMTP URI and logging
 Plugin URI: https://github.com/szepeviktor
 Description: SMTP settings for WordPress and error logging.
-Version: 0.4.4
+Version: 0.4.5
 License: The MIT License (MIT)
 Author: Viktor Szépe
 Author URI: http://www.online1.hu/webdesign/
 GitHub Plugin URI: https://github.com/szepeviktor/smtp-uri
 */
 
-/*
-@TODO Add DKIM header
-@TODO Option to skip newsletters.
-            "X-ALO-EM-Newsletter"  /?emtrck=  /?emunsub=  /plugins/alo-easymail/tr.php?v=
-            Newsletter
-            Mailpoet
+/* @TODO
+    Add DKIM header
+    Option to skip newsletters.
+        "X-ALO-EM-Newsletter"  /?emtrck=  /?emunsub=  /plugins/alo-easymail/tr.php?v=
+        Newsletter
+        Mailpoet
 */
 
 /**
@@ -28,17 +28,29 @@ GitHub Plugin URI: https://github.com/szepeviktor/smtp-uri
 class O1_Smtp_Uri {
 
     private $phpmailer = null;
+    private $from = null;
 
     public function __construct() {
 
+        // Remember From address
+        add_filter( 'wp_mail_from', array( $this, 'set_from' ), 4294967295 );
         // Set SMTP options
         add_action( 'phpmailer_init', array( $this, 'smtp_options' ), 4294967295 );
         // Handle last error
         add_action( 'shutdown', array( $this, 'handle_error' ), 4294967295 );
         // Settings in Options/Reading
         add_action( 'admin_init', array( $this, 'settings_init' ) );
-
+        // "Settings" link on Plugins page
+        add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_link' ) );
     }
+
+    public function set_from( $from ) {
+
+        $this->from = $from;
+
+        return $from;
+    }
+
 
     /**
      * Set PHPMailer SMTP options from the SMTP_URI named constant.
@@ -58,12 +70,20 @@ class O1_Smtp_Uri {
         // Set callback function for logging message data
         $mail->action_function = array( $this, 'callback' );
 
+        // Correct invalid From: address
+        if ( null !== $this->from && ! $mail->validateAddress( $this->from ) ) {
+            $mail->From = get_bloginfo( 'admin_email' );
+        }
+
         $smtp_uri = $this->get_smtp_uri();
         if ( empty( $smtp_uri ) ) {
             return;
         }
 
         $uri = parse_url( $smtp_uri );
+        if ( empty( $uri['scheme'] ) || empty( $uri['host'] ) ) {
+            return;
+        }
 
         // Protocol and encryption
         switch ( strtolower( $uri['scheme'] ) ) {
@@ -87,31 +107,41 @@ class O1_Smtp_Uri {
         }
 
         // Host name
-        if ( empty( $uri['host'] ) ) {
-            return;
-        }
         $mail->Host = urldecode( $uri['host'] );
 
+        // Safe to enable SMTP now
+        $mail->isSMTP();
+
         // Port
-        if ( is_int( $uri['port'] ) ) {
+        if ( ! empty( $uri['port'] ) && is_int( $uri['port'] ) ) {
             $mail->Port = $uri['port'];
         }
 
         // Authentication
         if ( ! empty( $uri['user'] ) && ! empty( $uri['pass'] ) ) {
-            $mail->SMTPAuth = true;
             $mail->Username = urldecode( $uri['user'] );
             $mail->Password = urldecode( $uri['pass'] );
+            $mail->SMTPAuth = true;
         }
 
-        $mail->isSMTP();
+        // Bcc admin email or the specified address
+        if ( ! empty( $uri['path'] ) ) {
+            if ( '/admin_email' === $uri['path'] ) {
+                $mail->addBCC( get_bloginfo( 'admin_email' ) );
+            } else {
+                $bcc = urldecode( ltrim( $uri['path'], '/' ) );
+                if ( $mail->validateAddress( $bcc ) ) {
+                    $mail->addBCC( $bcc );
+                }
+            }
+        }
 
         // Turn on SMTP debugging
-        //$mail->SMTPDebug = 4;
-        //$mail->Debugoutput = 'error_log';
-
-        // Bcc admin email
-        //$mail->addBCC( get_bloginfo( 'admin_email' ) );
+        $query = $this->parse_query( $uri['query'] );
+        if ( isset( $query['debug'] ) ) {
+            $mail->SMTPDebug = is_numeric( $query['debug'] ) ? (int)$query['debug'] : 4;
+            $mail->Debugoutput = 'error_log';
+        }
     }
 
     /**
@@ -250,6 +280,41 @@ class O1_Smtp_Uri {
         $escaped = preg_replace( '/[^\P{C}]+/u', "\xC2\xBF", $escaped );
 
         return $escaped;
+    }
+
+    /**
+     * Parse URL query string to an array.
+     *
+     * @param string $query_string  The query string
+     *
+     * @return array                The query as an array
+     */
+    private function parse_query( $query_string ) {
+        $query = array();
+        $names_values_array = explode( '&', $query_string );
+
+        foreach ( $names_values_array as $name_value ) {
+            $name_value_array = explode( '=', $name_value );
+
+            // Check field name
+            if ( empty( $name_value_array[0] ) )
+                continue;
+
+            // Set field value
+            $query[ $name_value_array[0] ] = isset( $name_value_array[1] ) ? $name_value_array[1] : '';
+        }
+
+        return $query;
+    }
+
+    public function plugin_link( $actions ) {
+
+        $link = sprintf( '<a href="%s">Settings</a>',
+            admin_url( 'options-general.php#smtp_uri' )
+        );
+        array_unshift( $actions, $link );
+
+        return $actions;
     }
 }
 
