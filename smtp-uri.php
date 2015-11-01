@@ -3,13 +3,14 @@
 Plugin Name: SMTP URI and logging
 Plugin URI: https://github.com/szepeviktor/smtp-uri
 Description: SMTP settings for WordPress and error logging.
-Version: 0.4.5
+Version: 0.4.6
 License: The MIT License (MIT)
 Author: Viktor Szépe
 GitHub Plugin URI: https://github.com/szepeviktor/smtp-uri
 */
 
 /* @TODO
+    Add $phpmailer->Timeout
     Add DKIM header
     Option to skip newsletters.
         "X-ALO-EM-Newsletter"  /?emtrck=  /?emunsub=  /plugins/alo-easymail/tr.php?v=
@@ -136,10 +137,12 @@ class O1_Smtp_Uri {
         }
 
         // Turn on SMTP debugging
-        $query = $this->parse_query( $uri['query'] );
-        if ( isset( $query['debug'] ) ) {
-            $mail->SMTPDebug = is_numeric( $query['debug'] ) ? (int)$query['debug'] : 4;
-            $mail->Debugoutput = 'error_log';
+        if ( ! empty( $uri['query'] ) ) {
+            $query = $this->parse_query( $uri['query'] );
+            if ( isset( $query['debug'] ) ) {
+                $mail->SMTPDebug = is_numeric( $query['debug'] ) ? (int)$query['debug'] : 4;
+                $mail->Debugoutput = 'error_log';
+            }
         }
     }
 

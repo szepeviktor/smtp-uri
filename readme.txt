@@ -4,7 +4,7 @@ Donate link: https://szepe.net/wp-donate/
 Tags: email, mail, send, smtp, starttls, tls, gmail, mandrill, hotmail, outlook
 Requires at least: 4.0
 Tested up to: 4.3
-Stable tag: 0.4.5
+Stable tag: 0.4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -65,7 +65,7 @@ Debug level can be set by adding a value: `?debug=4`, possible values: 0,1,2,4
 
 * Option to skip newsletters: ALO Newsletter, Newsletter, Mailpoet.
 * Video on installing and setting up this plugin.
-* Remove `smpt_uri` option on uninstallation (I hope you won't uninstall it)
+* Remove `smtp_uri` option on uninstallation (I hope you won't uninstall it)
 
 = Usage examples =
 
@@ -137,6 +137,9 @@ $mail->addBCC( get_bloginfo( 'admin_email' ) );
 `
 
 == Changelog ==
+
+= 0.4.6 =
+* Test URL query before using it
 
 = 0.4.5 =
 * Added plugin link
