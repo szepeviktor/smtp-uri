@@ -3,19 +3,19 @@
 Plugin Name: SMTP URI and logging
 Plugin URI: https://github.com/szepeviktor/smtp-uri
 Description: SMTP settings for WordPress and error logging.
-Version: 0.4.6
+Version: 0.4.7
 License: The MIT License (MIT)
 Author: Viktor Szépe
 GitHub Plugin URI: https://github.com/szepeviktor/smtp-uri
 */
 
 /* @TODO
-    Add $phpmailer->Timeout
-    Add DKIM header
-    Option to skip newsletters.
+    Option to skip newsletters
         "X-ALO-EM-Newsletter"  /?emtrck=  /?emunsub=  /plugins/alo-easymail/tr.php?v=
         Newsletter
         Mailpoet
+    Add $phpmailer->Timeout
+    Add DKIM header
 */
 
 /**
@@ -140,7 +140,7 @@ class O1_Smtp_Uri {
         if ( ! empty( $uri['query'] ) ) {
             $query = $this->parse_query( $uri['query'] );
             if ( isset( $query['debug'] ) ) {
-                $mail->SMTPDebug = is_numeric( $query['debug'] ) ? (int)$query['debug'] : 4;
+                $mail->SMTPDebug = is_numeric( $query['debug'] ) ? (int) $query['debug'] : 4;
                 $mail->Debugoutput = 'error_log';
             }
         }
@@ -164,8 +164,9 @@ class O1_Smtp_Uri {
             return;
         }
 
-        $error_message = sprintf( "SMTP error: To,Cc,Bcc=%s Message=%s",
+        $error_message = sprintf( 'SMTP error: To,Cc,Bcc=%s Subject=%s Message=%s',
             $this->esc_log( implode( ',' , array( $to, $cc, $bcc ) ) ),
+            $this->esc_log( $subject ),
             $this->esc_log( $body )
         );
 
@@ -183,13 +184,13 @@ class O1_Smtp_Uri {
             && property_exists( $this->phpmailer, 'ErrorInfo' )
             && ! empty( $this->phpmailer->ErrorInfo )
         ) {
-            $error_message =  sprintf( "SMTP error: %s", $this->esc_log( $this->phpmailer->ErrorInfo ) );
+            $error_message = sprintf( 'SMTP error: %s', $this->esc_log( $this->phpmailer->ErrorInfo ) );
 
             error_log( $error_message );
 
             if ( class_exists( 'SucuriScanEvent' ) ) {
                 if ( true !== SucuriScanEvent::report_critical_event( $error_message ) ) {
-                    error_log( "Sucuri Scan report event failure." );
+                    error_log( 'Sucuri Scan report event failure.' );
                 }
             }
         }
@@ -237,11 +238,11 @@ class O1_Smtp_Uri {
     public function admin_field() {
 
         $smtp_uri = esc_attr( $this->get_smtp_uri() );
-        $disabled = defined( 'SMTP_URI' ) ? ' disabled' : '';
+        $attrs = defined( 'SMTP_URI' ) ? sprintf( ' disabled title="%s"', $smtp_uri ) : '';
 
         printf( '<input name="smtp_uri" id="smtp_uri" type="text" class="regular-text code" value="%s"%s/>',
             $smtp_uri,
-            $disabled
+            $attrs
         );
         printf( '<p class="description">Format: <code>smtpTLS://USERNAME:PASSWORD@HOST:PORT</code></p>' );
         printf( '<p class="description">Enter <code>smtp://</code> for unencrypted connection</p>' );
@@ -273,11 +274,11 @@ class O1_Smtp_Uri {
      */
     private function esc_log( $data ) {
 
-        $escaped = serialize( $data ) ;
+        $escaped = serialize( $data );
         // Limit length
         $escaped = mb_substr( $escaped, 0, 500, 'utf-8' );
         // New lines to "|"
-        $escaped = str_replace( "\n", "|", $escaped );
+        $escaped = str_replace( "\n", '|', $escaped );
         // Replace non-printables with "¿"
         $escaped = preg_replace( '/[^\P{C}]+/u', "\xC2\xBF", $escaped );
 
@@ -299,8 +300,9 @@ class O1_Smtp_Uri {
             $name_value_array = explode( '=', $name_value );
 
             // Check field name
-            if ( empty( $name_value_array[0] ) )
+            if ( empty( $name_value_array[0] ) ) {
                 continue;
+            }
 
             // Set field value
             $query[ $name_value_array[0] ] = isset( $name_value_array[1] ) ? $name_value_array[1] : '';
