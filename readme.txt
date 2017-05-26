@@ -3,8 +3,8 @@ Contributors: szepe.viktor
 Donate link: https://szepe.net/wp-donate/
 Tags: email, mail, send, smtp, starttls, tls, gmail, mandrill, hotmail, outlook
 Requires at least: 4.0
-Tested up to: 4.4
-Stable tag: 0.4.7
+Tested up to: 4.7.1
+Stable tag: 0.4.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -138,8 +138,11 @@ $mail->addBCC( get_bloginfo( 'admin_email' ) );
 
 == Changelog ==
 
+= 0.4.8 =
+* Remove X-Mailer header
+
 = 0.4.7 =
-* Added title to SMTP URI input field when contant is defined
+* Added title to SMTP URI input field when constant is defined
 * WP 4.4 compatibility
 
 = 0.4.6 =

@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: SMTP URI and logging
-Plugin URI: https://github.com/szepeviktor/smtp-uri
+Version: 0.4.8
 Description: SMTP settings for WordPress and error logging.
-Version: 0.4.7
+Plugin URI: https://github.com/szepeviktor/smtp-uri
 License: The MIT License (MIT)
 Author: Viktor Szépe
 GitHub Plugin URI: https://github.com/szepeviktor/smtp-uri
@@ -38,10 +38,13 @@ class O1_Smtp_Uri {
         add_action( 'phpmailer_init', array( $this, 'smtp_options' ), 4294967295 );
         // Handle last error
         add_action( 'shutdown', array( $this, 'handle_error' ), 4294967295 );
-        // Settings in Options/Reading
-        add_action( 'admin_init', array( $this, 'settings_init' ) );
-        // "Settings" link on Plugins page
-        add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_link' ) );
+
+        if ( is_admin() ) {
+            // Settings in Options/Reading
+            add_action( 'admin_init', array( $this, 'settings_init' ) );
+            // "Settings" link on Plugins page
+            add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_link' ) );
+        }
     }
 
     public function set_from( $from ) {
@@ -69,6 +72,9 @@ class O1_Smtp_Uri {
 
         // Set callback function for logging message data
         $mail->action_function = array( $this, 'callback' );
+
+        // Remove X-Mailer header
+        $mail->XMailer = ' ';
 
         // Correct invalid From: address
         if ( null !== $this->from && ! $mail->validateAddress( $this->from ) ) {
@@ -322,4 +328,4 @@ class O1_Smtp_Uri {
     }
 }
 
-new O1_Smtp_Uri;
+new O1_Smtp_Uri();
