@@ -58,8 +58,9 @@ class O1_Smtp_Uri {
     /**
      * Set PHPMailer SMTP options from the SMTP_URI named constant.
      *
-     * @see: https://wordpress.org/plugins/wp-mailfrom-ii/
-     * @param: object $mail PHPMailer instance.
+     * @see https://wordpress.org/plugins/wp-mailfrom-ii/
+     *
+     * @param \PHPMailer $mail PHPMailer instance.
      * @return void
      */
     public function smtp_options( $mail ) {
@@ -87,7 +88,7 @@ class O1_Smtp_Uri {
         }
 
         $uri = parse_url( $smtp_uri );
-        if ( empty( $uri['scheme'] ) || empty( $uri['host'] ) ) {
+        if ( ! is_array( $uri ) || empty( $uri['scheme'] ) || empty( $uri['host'] ) ) {
             return;
         }
 
@@ -259,7 +260,7 @@ class O1_Smtp_Uri {
     /**
      * Retrieve the URI.
      *
-     * @return @void
+     * @return string
      */
     private function get_smtp_uri() {
 
@@ -275,8 +276,8 @@ class O1_Smtp_Uri {
     /**
      * Prepare any data for logging.
      *
-     * @param string $string Any data.
-     * @return string        The escaped string.
+     * @param string $data Any data.
+     * @return string      The escaped string.
      */
     private function esc_log( $data ) {
 
@@ -286,7 +287,7 @@ class O1_Smtp_Uri {
         // New lines to "|"
         $escaped = str_replace( "\n", '|', $escaped );
         // Replace non-printables with "¿"
-        $escaped = preg_replace( '/[^\P{C}]+/u', "\xC2\xBF", $escaped );
+        $escaped = (string) preg_replace( '/[^\P{C}]+/u', "\xC2\xBF", $escaped );
 
         return $escaped;
     }
